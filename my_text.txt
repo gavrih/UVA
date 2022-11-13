@@ -42,7 +42,7 @@ print "let's_fly"
 breaks = 0 
 sleep 10000 
 throttle = 1 
-while alt < -200 { 
+while alt < 2000 { 
 	print heading 
 	rudder = ( h0 - heading ) / 20 
 	print roll 

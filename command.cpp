@@ -24,9 +24,9 @@ bool check_element(unordered_map<string, double> map, string element)
 
 {
   if (map.count(element))
-    return 0;
-  else
     return 1;
+  else
+    return 0;
 }
 
 void change_equation(vector<vector<string>> lines_while)
@@ -132,7 +132,7 @@ data_simulator::get_instance()->simulator_table[var_map[line[0]]] = stoi(line[2]
 
     for (int i = 2; i < line.size(); i++)
     {
-      if (check_element(data_simulator::get_instance()->simulator_table, line[i]) == 0)
+      if (check_element(data_simulator::get_instance()->simulator_table, line[i]) == 1)
       {
         line[i] = data_simulator::get_instance()->simulator_table[line[i]];
       }
