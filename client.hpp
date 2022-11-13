@@ -1,14 +1,18 @@
 #include <iostream>
-class client
+
+class Client
 {
-private:
-         static client *instance;
-         client(){};
-        ~client(){};
-    
 public:
- void thread_client(std::string);
-    void Connect(int port, const char *ip);
-   static void Send(std::string send_set);
-   static client *get_instance();
+    void connecting_client(int port, const char *ip);
+    void send_to_simulator(std::string send_set);
+    static Client *get_instance();
+
+private:
+    Client() = default;
+    ~Client() {delete instance;};
+
+private:
+    static Client *instance;
+    char buffer[1024] = {0};
+    int sock = 0;
 };

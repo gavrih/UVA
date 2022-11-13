@@ -14,21 +14,24 @@
 //#define PORT 5400
 int server_fd, new_socket, valread, counter;
 char buffer[1024] = {0};
-server *server::instance = 0;
-server *server::get_instance()
+Server *Server::instance = 0;
+Server *Server::get_instance()
 {
 
 	if (!instance)
 	{
-		instance = new server();
+		instance = new Server();
 	}
 	return instance;
 }
-std::vector<double> server::Splite_line(std::string line)
+// void launchFG() {
+//           system("fgfs --telnet=socket,in,10,127.0.0.1,5402,tcp --generic=socket,out,10,127.0.0.1,5400,tcp,generic_small");
+// 		  }
+std::vector<double> Server::splite_line(std::string line)
 {
 	std::vector<double> values;
 	std::string word = " ";
-	
+
 	for (int i = 0; i < line.length(); ++i)
 	{
 		if (line[i] == ',')
@@ -41,12 +44,12 @@ std::vector<double> server::Splite_line(std::string line)
 		{
 			word.push_back(line[i]);
 		}
-		// values.push_back(std::stod(word));
 	}
 	return values;
 };
-void server::openServer(int port)
+void Server::openServer(int port)
 {
+
 	struct sockaddr_in address;
 	int opt = 1;
 	int addrlen = sizeof(address);
@@ -90,23 +93,20 @@ void server::openServer(int port)
 		exit(EXIT_FAILURE);
 	}
 
-	std::thread th(server::get_instance()->read_data);
+	std::thread th(Server::get_instance()->read_data);
 	th.detach();
 }
-void server::read_data()
+void Server::read_data()
 {
 
 	while (1)
 	{
 
 		valread = read(new_socket, buffer, 1024);
-		std::vector<double> values = server::get_instance()->Splite_line(buffer);
+		std::vector<double> values = Server::get_instance()->splite_line(buffer);
 		for (int i = 0; i < values.size(); i++)
 		{
-			data_simulator::get_instance()->simulator_table[server::get_instance()->paths[i]] = values[i];
+			data_simulator::get_instance()->symbol_table[Server::get_instance()->paths[i]] = values[i];
 		}
-
 	}
 };
-
-

@@ -2,17 +2,18 @@
 #include <iostream>
 #include <unordered_map>
 #include "command.hpp"
-#include "data_command.hpp"
 
-
-class parser
+class Parser
 {
-    
-private:
 public:
-    void par(std::vector<std::vector<std::string>>);
-    parser(){};
-    ~parser(){};
+    static vector<vector<string>> lines_while;
+    unordered_map<std::string, Command *> command_map;
 
+public:
+    void parse(std::vector<std::vector<std::string>> &);
+    Parser();
+    ~Parser();
+
+private:
+    string commands;
 };
-

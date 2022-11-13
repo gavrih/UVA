@@ -8,25 +8,22 @@
 #include <thread>
 #include "client.hpp"
 
-
-
-client *client::instance = 0;
-client *client::get_instance()
+Client *Client::instance = 0;
+Client *Client::get_instance()
 {
 
 	if (!instance)
 	{
-instance = new client();
+		instance = new Client();
 	}
-		return instance;
+	return instance;
 }
 
-
-int sock = 0;
-void client::Connect(int port, const char *ip)
+void Client::connecting_client(int port, const char *ip)
 {
+
 	struct sockaddr_in serv_addr;
-char buffer[1024] = {0};
+	
 
 	char *hello = (char *)"ls\r\n";
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -53,16 +50,10 @@ char buffer[1024] = {0};
 		printf("\nConnection Failed \n");
 		return;
 	}
-
 }
-	void client::Send(std::string send_set)
-	{
-	send(sock, send_set.c_str(), send_set.length(),0);
-		// printf("Hello message sent\n");
-	 std::cout<<send_set<<std::endl;
-	}
+void Client::send_to_simulator(std::string send_set)
+{
+	send(sock, send_set.c_str(), send_set.length(), 0);
 
-
-
-
-
+	std::cout << send_set << std::endl;
+}

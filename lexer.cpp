@@ -6,17 +6,6 @@
 
 using namespace std;
 
-Lexer *Lexer::instance = 0;
-Lexer *Lexer::get_instance()
-{
-
-    if (!instance)
-    {
-        instance = new Lexer();
-    }
-    return instance;
-}
-
 void Lexer::create_data()
 {
     string myline;
@@ -36,11 +25,6 @@ vector<string> Lexer::splite_row(string str, vector<string> texts)
     string word = "";
     for (auto x : str)
     {
-        if (x == '"')
-        {
-            continue;
-        }
-
         if (x == ' ')
         {
             texts.push_back(word);
@@ -48,6 +32,7 @@ vector<string> Lexer::splite_row(string str, vector<string> texts)
         }
         else
         {
+            
             word = word + x;
         }
     }

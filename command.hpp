@@ -4,89 +4,71 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include "SuntingYardToken.cpp"
+#include "ShuntingYardToken.cpp"
 
 using namespace std;
-
-class command
-{
-private:
-public:
-    virtual void do_command(vector<vector<string>> ,int) = 0;
-    command(){};
-    ~command(){};
-};
-
-class openDataServer : public command
-{
-private:
-    /* data */
-public:
-    void do_command(vector<vector<string>> ,int);
-    openDataServer(/* args */){};
-    ~openDataServer(){};
-};
-
-class connect_client : public command
-{
-private:
-    /* data */
-public:
-    void do_command(vector<vector<string>> ,int);
-    connect_client(/* args */){};
-    ~connect_client(){};
-};
-
 static unordered_map<string, string> var_map;
-class var : public command
-{
-private:
-    /* data */
 
-public:
-    void do_command(vector<vector<string>> ,int);
-    var(/* args */){};
-    ~var(){};
-};
-static unordered_map<string, double> var_value;
-
-class variables : public command
+class Command
 {
-private:
-    /* data */
 public:
-    void do_command(vector<vector<string>> ,int);
-    variables(/* args */){};
-    ~variables(){};
+    virtual void do_command(const vector<string> &) = 0;
+    Command() = default;
+    ~Command() = default;
 };
 
-class while_loop : public command
+class OpenDataServer : public Command
 {
-private:
-    /* data */
 public:
-    void do_command(vector<vector<string>> ,int);
-    while_loop(){};
-    ~while_loop(){};
+    void do_command(const vector<string> &);
+    OpenDataServer() = default;
+    ~OpenDataServer() = default;
 };
 
-class print_text : public command
+class Connect_Client : public Command
 {
-private:
-    /* data */
 public:
-    void do_command(vector<vector<string>> ,int);
-    print_text(){};
-    ~print_text(){};
+    void do_command(const vector<string> &);
+    Connect_Client() = default;
+    ~Connect_Client() = default;
 };
 
-class Sleep : public command
+class Var : public Command
 {
-private:
-    /* data */
 public:
-    void do_command(vector<vector<string>> ,int);
-    Sleep(){};
-    ~Sleep(){};
+    void do_command(const vector<string> &);
+    Var() = default;
+    ~Var() = default;
 };
 
+class Variables : public Command
+{
+public:
+    void do_command(const vector<string> &);
+    Variables() = default;
+    ~Variables() = default;
+};
+
+class While_Loop : public Command
+{
+public:
+    void do_command(const vector<string> &);
+    While_Loop() = default;
+    ~While_Loop() = default;
+};
+
+class Print_Text : public Command
+{
+public:
+    void do_command(const vector<string> &);
+    Print_Text() = default;
+    ~Print_Text() = default;
+};
+
+class Sleep : public Command
+{
+public:
+    void do_command(const vector<string> &);
+    Sleep() = default;
+    ~Sleep() = default;
+};

@@ -3,20 +3,16 @@
 #include <vector>
 #include "parser.hpp"
 #include "lexer.hpp"
- 
 
 int main()
 {
-
-    Lexer::get_instance()->create_data();
-    data_command::get_instance1()->update_map();
-    parser ps;
-    ps.par(Lexer::get_instance()->alllines);
-
-
-
-
-    void delete_refrense();
-
+    Lexer *lex = new Lexer();
+    lex->create_data();
+    Parser *ps = new Parser();
+    ps->parse(lex->alllines);
+    
+    delete lex;
+    delete ps;
+     
     return 0;
 }

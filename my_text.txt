@@ -37,12 +37,14 @@ print "engine_is_warming..."
 rpm = 800 
 print rpm 
 var h0 = heading 
+print heading 
+print h0 
 sleep 15000 
 print "let's_fly" 
 breaks = 0 
 sleep 10000 
 throttle = 1 
-while alt < 2000 { 
+while alt < 500 { 
 	print heading 
 	rudder = ( h0 - heading ) / 20 
 	print roll 

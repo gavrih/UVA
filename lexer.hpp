@@ -7,17 +7,14 @@ using namespace std;
 
 class Lexer
 {
-private:
-    Lexer(){}
-static Lexer *instance;
-    
-    ~Lexer(){}
-   
+public:
+    void create_data();
+    Lexer() = default;
+    ~Lexer() = default;
 
 public:
     vector<vector<string>> alllines;
-    static Lexer *get_instance();
-    void create_data();
+
+private:
     vector<string> splite_row(string, vector<string>);
-    
 };
