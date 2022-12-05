@@ -1,5 +1,5 @@
 // Client side C/C++ program to demonstrate Socket
-// 
+//
 #include <iostream>
 #include <arpa/inet.h>
 #include <stdio.h>
@@ -9,8 +9,7 @@
 #include <thread>
 #include "client.hpp"
 
-
-Client& Client::get_instance()
+Client &Client::get_instance()
 {
 
 	static Client instance;
@@ -21,7 +20,6 @@ void Client::connecting_client(int port, const char *ip)
 {
 
 	struct sockaddr_in serv_addr;
-	
 
 	std::string hello = (char *)"ls\r\n";
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -51,7 +49,7 @@ void Client::connecting_client(int port, const char *ip)
 }
 void Client::send_to_simulator(const std::string &path, const std::string &value)
 {
-  std::string send_set = "set " + path + " " + value + "\r\n";
+	std::string send_set = "set " + path + " " + value + "\r\n";
 	send(sock, send_set.c_str(), send_set.length(), 0);
 
 	std::cout << send_set << std::endl;

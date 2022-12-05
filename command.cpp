@@ -64,16 +64,12 @@ void Var::do_command(const std::vector<std::string> &line)
     for (size_t i = 0; i < line[4].size(); i++)
     {
       if (line[4][i] == '"')
-      {
-        continue;
-      }
+          continue;
       else
-      {
-        path += line[4][i];
-      }
+          path += line[4][i];
     }
 
-    DB::get_instance().insert(line[1], "0.0", path);
+      DB::get_instance().insert(line[1], "0.0", path);
   }
   else
   {
