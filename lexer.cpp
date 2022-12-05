@@ -4,25 +4,25 @@
 #include <vector>
 #include "lexer.hpp"
 
-using namespace std;
+
 
 void Lexer::create_data()
 {
-    string myline;
-    ifstream MyReadFile("my_text.txt");
+    std::string myline;
+    std::ifstream MyReadFile("my_text.txt");
     while (getline(MyReadFile, myline))
     {
 
-        vector<string> texts;
-        vector<string> row = splite_row(myline, texts);
+        std::vector<std::string> texts;
+        std::vector<std::string> row = splite_row(myline, texts);
         alllines.push_back(row);
     }
 }
 
-vector<string> Lexer::splite_row(string str, vector<string> texts)
+std::vector<std::string> Lexer::splite_row(const std::string& str,std::vector<std::string>& texts)
 {
 
-    string word = "";
+    std::string word = "";
     for (auto x : str)
     {
         if (x == ' ')

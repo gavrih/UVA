@@ -1,26 +1,23 @@
 #pragma once
 
-#include <iostream>
-#include <string>
+
 #include <vector>
 #include <unordered_map>
-#include "ShuntingYardToken.cpp"
 
-using namespace std;
-static unordered_map<string, string> var_map;
+
 
 class Command
 {
 public:
-    virtual void do_command(const vector<string> &) = 0;
+    virtual void do_command(const std::vector<std::string> &) = 0;
     Command() = default;
-    ~Command() = default;
+   virtual ~Command() = default;
 };
 
 class OpenDataServer : public Command
 {
 public:
-    void do_command(const vector<string> &);
+    void do_command(const std::vector<std::string> &);
     OpenDataServer() = default;
     ~OpenDataServer() = default;
 };
@@ -28,7 +25,7 @@ public:
 class Connect_Client : public Command
 {
 public:
-    void do_command(const vector<string> &);
+    void do_command(const std::vector<std::string> &);
     Connect_Client() = default;
     ~Connect_Client() = default;
 };
@@ -36,7 +33,7 @@ public:
 class Var : public Command
 {
 public:
-    void do_command(const vector<string> &);
+    void do_command(const std::vector<std::string> &);
     Var() = default;
     ~Var() = default;
 };
@@ -44,7 +41,7 @@ public:
 class Variables : public Command
 {
 public:
-    void do_command(const vector<string> &);
+    void do_command(const std::vector<std::string> &);
     Variables() = default;
     ~Variables() = default;
 };
@@ -52,15 +49,18 @@ public:
 class While_Loop : public Command
 {
 public:
-    void do_command(const vector<string> &);
+    void do_command(const std::vector<std::string> &);
     While_Loop() = default;
     ~While_Loop() = default;
+
+private:
+    bool expression(double x, const std::string &operat, double y);
 };
 
 class Print_Text : public Command
 {
 public:
-    void do_command(const vector<string> &);
+    void do_command(const std::vector<std::string> &);
     Print_Text() = default;
     ~Print_Text() = default;
 };
@@ -68,7 +68,7 @@ public:
 class Sleep : public Command
 {
 public:
-    void do_command(const vector<string> &);
+    void do_command(const std::vector<std::string> &);
     Sleep() = default;
     ~Sleep() = default;
 };

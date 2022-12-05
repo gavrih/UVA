@@ -1,5 +1,6 @@
 // Client side C/C++ program to demonstrate Socket
-// programming
+// 
+#include <iostream>
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <string.h>
@@ -8,14 +9,11 @@
 #include <thread>
 #include "client.hpp"
 
-Client *Client::instance = 0;
-Client *Client::get_instance()
+
+Client& Client::get_instance()
 {
 
-	if (!instance)
-	{
-		instance = new Client();
-	}
+	static Client instance;
 	return instance;
 }
 
@@ -25,7 +23,7 @@ void Client::connecting_client(int port, const char *ip)
 	struct sockaddr_in serv_addr;
 	
 
-	char *hello = (char *)"ls\r\n";
+	std::string hello = (char *)"ls\r\n";
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 	{
 		printf("\n Socket creation error \n");
@@ -51,8 +49,9 @@ void Client::connecting_client(int port, const char *ip)
 		return;
 	}
 }
-void Client::send_to_simulator(std::string send_set)
+void Client::send_to_simulator(const std::string &path, const std::string &value)
 {
+  std::string send_set = "set " + path + " " + value + "\r\n";
 	send(sock, send_set.c_str(), send_set.length(), 0);
 
 	std::cout << send_set << std::endl;

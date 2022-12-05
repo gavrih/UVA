@@ -9,51 +9,28 @@
 #include <thread>
 #include <vector>
 #include "server.hpp"
-#include "data_simulator.hpp"
+#include "database.hpp"
 
 //#define PORT 5400
-int server_fd, new_socket, valread, counter;
-char buffer[1024] = {0};
-Server *Server::instance = 0;
-Server *Server::get_instance()
-{
+int server_fd, new_socket, counter, valread;
 
-	if (!instance)
-	{
-		instance = new Server();
-	}
+Server &Server::get_instance()
+{
+	static Server instance;
 	return instance;
 }
+
 // void launchFG() {
 //           system("fgfs --telnet=socket,in,10,127.0.0.1,5402,tcp --generic=socket,out,10,127.0.0.1,5400,tcp,generic_small");
 // 		  }
-std::vector<double> Server::splite_line(std::string line)
-{
-	std::vector<double> values;
-	std::string word = " ";
 
-	for (int i = 0; i < line.length(); ++i)
-	{
-		if (line[i] == ',')
-		{
-			values.push_back(std::stod(word));
-			word = " ";
-		}
-
-		else
-		{
-			word.push_back(line[i]);
-		}
-	}
-	return values;
-};
 void Server::openServer(int port)
 {
 
 	struct sockaddr_in address;
 	int opt = 1;
 	int addrlen = sizeof(address);
-	char *hello = (char *)"Hello from server";
+	std::string hello = (char *)"Hello from server";
 
 	// Creating socket file descriptor
 	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
@@ -93,20 +70,61 @@ void Server::openServer(int port)
 		exit(EXIT_FAILURE);
 	}
 
-	std::thread th(Server::get_instance()->read_data);
+	std::thread th(&Server::read_data, this);
 	th.detach();
 }
+
 void Server::read_data()
 {
-
+	char c;
+	std::string buffer;
 	while (1)
 	{
+		bool ok = true;
+		c = {0};
+		valread = 0;
+		buffer.clear();
 
-		valread = read(new_socket, buffer, 1024);
-		std::vector<double> values = Server::get_instance()->splite_line(buffer);
-		for (int i = 0; i < values.size(); i++)
+		while (c != '\n')
 		{
-			data_simulator::get_instance()->symbol_table[Server::get_instance()->paths[i]] = values[i];
+			valread = read(new_socket, &c, 1);
+
+			buffer += c;
+			if (c < 0)
+			{
+				ok = false;
+				break;
+			}
+		}
+
+		if (ok)
+		{
+			std::vector<double> values = splite_line(buffer);
+			for (size_t i = 0; i < values.size(); i++)
+			{
+				DB::get_instance().setData(paths[i], values[i]);
+			}
 		}
 	}
-};
+}
+
+std::vector<double> Server::splite_line(const std::string &line)
+{
+	std::vector<double> values;
+	std::string word = " ";
+
+	for (size_t i = 0; i < line.length(); ++i)
+	{
+		if (line[i] == ',')
+		{
+			values.push_back(std::stod(word));
+			word = " ";
+		}
+
+		else
+		{
+			word.push_back(line[i]);
+		}
+	}
+	return values;
+}

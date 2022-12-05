@@ -5,9 +5,8 @@
 #include "parser.hpp"
 #include "lexer.hpp"
 
-using namespace std;
 
-vector<vector<string>> Parser::lines_while;
+std::vector<std::vector<std::string>> Parser::lines_while;
 
 Parser::Parser()
 {
@@ -29,10 +28,10 @@ Parser::~Parser()
   delete command_map["print"];
   delete command_map["sleep"];
 }
-void Parser::parse(vector<vector<string>> &alllines)
+void Parser::parse( std::vector<std::vector<std::string>> &alllines)
 {
 
-  for (int i = 0; i < alllines.size(); i++)
+  for (size_t i = 0; i < alllines.size(); i++)
   {
 
     if (!command_map.count(alllines[i][0]))

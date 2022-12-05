@@ -1,106 +1,67 @@
-
 #include <iostream>
-#include <unistd.h>
-#include <thread>
 #include <chrono>
 #include "command.hpp"
 #include "server.hpp"
 #include "client.hpp"
-#include "lexer.hpp"
-#include "data_simulator.hpp"
+#include "database.hpp"
 #include "parser.hpp"
+#include "tools.cpp"
+#include "ShuntingYardToken.cpp"
 
-using namespace std;
-
-bool check_element(unordered_map<string, double> map, string element)
-
+std::string change_equation(const std::string &str)
 {
-  if (map.count(element))
-    return 1;
-  else
-    return 0;
-}
-double check_value(string a)
-{
-  double value;
-  if (check_element(data_simulator::get_instance()->symbol_table, a) == 1)
+  std::string new_string;
+  for (size_t i = 0; i < str.size(); i++)
   {
-    value = data_simulator::get_instance()->symbol_table[a];
-    return value;
-  }
-  else
-  {
+    if (isalpha(str[i]))
+    {
+      std::string str_;
+      while (isalpha(str[i]) || isdigit(str[i]))
+      {
+        str_ += str[i];
+        i++;
+      }
+      i--;
 
-    string path = var_map[a];
-    value = data_simulator::get_instance()->symbol_table[path];
-    return value;
-  }
-}
-
-void change_equation(vector<string> line)
-{
-
-  if (var_map.find(line[0]) != var_map.end())
-  {
-    for (int i = 2; i < line.size(); i++)
+      double value = DB::get_instance().getValue(str_);
+      new_string += std::to_string(value);
+    }
+    else
     {
 
-      if (var_map.find(line[i]) != var_map.end())
-      {
-        double value = check_value(line[i]);
-
-        string str_value = to_string(value);
-        line[i] = str_value;
-      }
+      new_string += str[i];
     }
   }
-
-  string str_to_sunting = "";
-  for (int i = 2; i < line.size(); i++)
-  {
-
-    str_to_sunting += (line[i]);
-  }
-
   Calculator c;
-  string new_valoue = to_string(c.calculate(str_to_sunting));
-  vector<string> line_fix = {line[0], line[1], new_valoue};
-  string send_set = "set " + var_map[line_fix[0]] + " " + line_fix[2] + "\r\n";
-  Client::get_instance()->send_to_simulator(send_set);
-  data_simulator::get_instance()->symbol_table[var_map[line_fix[0]]] = stod(new_valoue);
-  str_to_sunting = "";
+  std::string new_value = std::to_string(c.calculate(new_string));
+  return new_value;
 }
 
-void OpenDataServer::do_command(const vector<string> &line)
+void OpenDataServer::do_command(const std::vector<std::string> &line)
 {
-  cout << "connecting server......" << endl;
+  std::cout << "connecting server......" << std::endl;
 
   int port = stoi(line[1]);
 
-  Server::get_instance()->openServer(port);
+  Server::get_instance().openServer(port);
 }
 
-void Connect_Client::do_command(const vector<string> &line)
+void Connect_Client::do_command(const std::vector<std::string> &line)
 {
 
   int port = stoi(line[2]);
   const char *ip = line[1].c_str();
 
-  Client::get_instance()->connecting_client(port, ip);
-  cout << " The client connected" << endl;
+  Client::get_instance().connecting_client(port, ip);
+  std::cout << " The client connected" << std::endl;
 }
 
-void Var::do_command(const vector<string> &line)
+void Var::do_command(const std::vector<std::string> &line)
 {
-
-  for (int i = 0; i < line.size(); i++)
-  {
-  }
-
   if (line[3] == "bind")
   {
-    string path;
-    for (int i = 0; i < line[4].size(); i++)
+    std::string path;
+    for (size_t i = 0; i < line[4].size(); i++)
     {
       if (line[4][i] == '"')
       {
@@ -112,47 +73,86 @@ void Var::do_command(const vector<string> &line)
       }
     }
 
-    var_map.insert({line[1], path});
-    data_simulator::get_instance()->symbol_table.insert({path, 0.0});
+    DB::get_instance().insert(line[1], "0.0", path);
   }
   else
   {
-    var_map.insert({line[1], to_string(check_value(line[3]))});
-    data_simulator::get_instance()->symbol_table.insert({line[1], check_value(line[3])});
+    std::string string_line;
+    for (size_t i = 3; i < line.size(); i++)
+    {
+      string_line += line[i];
+    }
+    std::string value = change_equation(string_line);
+
+    DB::get_instance().insert(line[1], value, " ");
   }
 }
 
-void Variables::do_command(const vector<string> &line)
+void Variables::do_command(const std::vector<std::string> &line)
 {
-  change_equation(line);
+  std::string string_line;
+  for (size_t i = 2; i < line.size(); i++)
+  {
+    string_line += line[i];
+  }
+  std::string new_value = change_equation(string_line);
+
+  Client::get_instance().send_to_simulator(DB::get_instance().getPath(line[0]), new_value);
 }
 
-void While_Loop::do_command(const vector<string> &line)
+void While_Loop::do_command(const std::vector<std::string> &line)
 {
   Parser pars;
-  while (check_value(line[1]) < stoi(line[3]))
+  while (expression(DB::get_instance().getValue(line[1]), line[2], stod(line[3])))
   {
     pars.parse(Parser::lines_while);
   }
 }
 
-void Print_Text::do_command(const vector<string> &line)
+bool While_Loop::expression(double x, const std::string &operat, double y)
+{
+  if ((operat == "<" && (x < y)))
+    return true;
+  else if ((operat == ">") && (x > y))
+    return true;
+  else if ((operat == ">=") && (x >= y))
+    return true;
+  else if ((operat == "<=") && (x <= y))
+    return true;
+  else if ((operat == "==") && (x == y))
+    return true;
+  else if ((operat == "!=") && (x != y))
+    return true;
+  return false;
+}
+
+void Print_Text::do_command(const std::vector<std::string> &line)
 {
 
   if (line[1].front() == '"')
   {
-    cout << line[1] << endl;
+    std::cout << line[1] << std::endl;
   }
 
   else
   {
-    cout << line[1] << ":" << check_value(line[1]) << endl;
+    std::string new_str;
+    for (size_t i = 1; i < line.size(); i++)
+    {
+      new_str += line[i];
+    }
+
+    std::cout << line[1] << ":" << change_equation(new_str) << std::endl;
   }
 }
 
-void Sleep::do_command(const vector<string> &line)
+void Sleep::do_command(const std::vector<std::string> &line)
 {
-
-  cout << "Waiting " << line[1] << " Milliseconds" << endl;
-  this_thread::sleep_for(chrono::milliseconds(stoi(line[1])));
+  std::string new_str;
+  for (size_t i = 1; i < line.size(); i++)
+  {
+    new_str += line[i];
+  }
+  std::cout << "Waiting " << change_equation(new_str) << " Milliseconds" << std::endl;
+  std::this_thread::sleep_for(std::chrono::milliseconds(stoi(line[1])));
 }
